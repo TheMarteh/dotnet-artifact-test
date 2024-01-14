@@ -32,15 +32,25 @@ jobs:
     
     - name: Publish
       run: dotnet publish ./dotnet-artifact-test.sln --configuration Release --no-restore --no-build --output '${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}'
-
+      
     - name: List contents   # temp
       run: ls -R            # temp
-
-    - name: Publish Artifact
-      uses: actions/upload-artifact@v2
+    
+    - name: Create release
+      uses: marvinpinto/action-automatic-releases@latest
       with:
-        name: dotnet-artifact
-        path: ${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        automatic_release_tag: true
+        files: |
+          ${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}/*.*
+
+
+    # - name: Publish Artifact
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: dotnet-artifact
+    #     path: ${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}
 
     # - name: Upload artifact as new release asset
     #   uses: actions/upload-release-asset@v1
