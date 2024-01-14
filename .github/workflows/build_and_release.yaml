@@ -1,0 +1,63 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0' 
+
+    - name: Build
+      run: dotnet build --configuration Release
+
+    - name: Publish Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-artifact
+        path: ./dotnet-artifact-test/bin/Release/net8.0
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: dotnet-artifact
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Artifact
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dotnet-artifact-test/bin/Release/net8.0 # Change this to the actual path of your built artifact
+        asset_name: release.zip # Change this to the desired artifact name
+        asset_content_type: application/zip
