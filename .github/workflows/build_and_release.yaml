@@ -5,61 +5,47 @@ on:
     branches:
       - main
 
+env:
+  DOTNET_WEBAPP_PACKAGE_PATH: "./publish"
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0' 
 
-    - name: Build
-      run: dotnet build --configuration Release
+    - name: Restore dependencies
+      run: dotnet restore ./dotnet-artifact-test.sln
 
-    - name: List contents
-      run: ls -R
+    - name: Build
+      run: dotnet build ./dotnet-artifact-test.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test ./dotnet-artifact-test.sln --no-restore --verbosity normal
+    
+    - name: Publish
+      run: dotnet publish ./dotnet-artifact-test.sln --configuration Release --no-restore --no-build --output d --output '${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}'
+
+    - name: List contents   # temp
+      run: ls -R            # temp
 
     - name: Publish Artifact
       uses: actions/upload-artifact@v2
       with:
         name: dotnet-artifact
-        path: ./bin/Release/net8.0
+        path: ${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: dotnet-artifact
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./bin/Release/net8.0
-        asset_name: dotnet-artifact.zip
-        asset_content_type: application/zip
+    # - name: Upload artifact as new release asset
+    #   uses: actions/upload-release-asset@v1
+    #   with:
+    #     upload_url: ${{ github.event.release.upload_url }}
+    #     asset_path: ${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}
+    #     asset_name: dotnet-artifact.zip
+    #     asset_content_type: application/zip
