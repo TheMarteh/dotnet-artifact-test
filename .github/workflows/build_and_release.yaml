@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: dotnet-artifact
-        path: ./dotnet-artifact-test/bin/Release/net8.0
+        path: ./bin/Release/net8.0
 
   release:
     needs: build
@@ -60,6 +60,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dotnet-artifact/dotnet-artifact-test/bin/Release/net8.0
+        asset_path: ./bin/Release/net8.0
         asset_name: dotnet-artifact.zip
         asset_content_type: application/zip
