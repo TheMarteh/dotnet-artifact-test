@@ -31,7 +31,7 @@ jobs:
       run: dotnet test ./dotnet-artifact-test.sln --no-restore --verbosity normal
     
     - name: Publish
-      run: dotnet publish ./dotnet-artifact-test.sln --configuration Release --no-restore --no-build --output d --output '${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}'
+      run: dotnet publish ./dotnet-artifact-test.sln --configuration Release --no-restore --no-build --output '${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}'
 
     - name: List contents   # temp
       run: ls -R            # temp
