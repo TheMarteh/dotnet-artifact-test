@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  DOTNET_WEBAPP_PACKAGE_PATH: "./publish"
+  DOTNET_WEBAPP_PACKAGE_PATH: "./bin/Release/net8.0"
 
 jobs:
   build:
@@ -39,7 +39,7 @@ jobs:
     - name: Create release
       uses: marvinpinto/action-automatic-releases@latest
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        repo_token: "${{ secrets.PAT }}"
         prerelease: false
         automatic_release_tag: true
         files: |
