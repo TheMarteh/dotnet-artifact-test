@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-app.MapGet("/update", () => "Hello World!");
+app.MapGet("/update", () => ScriptRunner.Run());
+app.MapGet("/", () => "Hello World!");
 
 app.Run();
