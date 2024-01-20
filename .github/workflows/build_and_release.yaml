@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  DOTNET_WEBAPP_PACKAGE_PATH: "./bin/Release/net8.0"
+  DOTNET_WEBAPP_PACKAGE_PATH: "./bin/Release/net7.0"
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0' 
+        dotnet-version: '7.0' 
 
     - name: Restore dependencies
       run: dotnet restore ./dotnet-artifact-test.sln
@@ -35,6 +35,9 @@ jobs:
       
     - name: List contents   # temp
       run: ls -R            # temp
+
+    - name: Zip artifact
+      run: zip -r dotnet-artifact.zip ${{ env.DOTNET_WEBAPP_PACKAGE_PATH }}
     
     - name: Create release
       uses: marvinpinto/action-automatic-releases@latest
